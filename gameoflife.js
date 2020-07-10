@@ -1,18 +1,24 @@
-let w;
+// most of this is from https://p5js.org/examples/simulate-game-of-life.html
+
 let columns;
 let rows;
 let board;
 let next;
 
-let decay = 0.05;
+const cellSize = 15;
+const gutterSize = 1;
+const colourBackground = '#000';
+const colourStroke = '#000';
+const decay = 0.02;
+const colourAlive = '#f41';
+const colourDead = '#ccc';
 
 function setup() {
-  frameRate(20);
-  createCanvas(1000, 500);
-  w = 20;
+  frameRate(30);
+  createCanvas(windowWidth, windowHeight);
   // Calculate columns and rows
-  columns = floor(width / w);
-  rows = floor(height / w);
+  columns = floor(width / cellSize);
+  rows = floor(height / cellSize);
   // Wacky way to make a 2D array is JS
   board = new Array(columns);
   for (let i = 0; i < columns; i++) {
@@ -27,16 +33,19 @@ function setup() {
 }
 
 function draw() {
-  background(0);
+  background(colourBackground);
   generate();
   for ( let i = 0; i < columns;i++) {
     for ( let j = 0; j < rows;j++) {
+      // if a cell is alive, colour it alive
+      // otherwise, fade the dead colour into the background depending on the cell's age
       if ((board[i][j] == 1)) {
-        fill(255, 100, 0);
+        fill(colourAlive);
+      } else {
+        fill(lerpColor(color(colourBackground), color(colourDead), board[i][j]));
       }
-      else fill(255 * board[i][j]);
-      stroke(0);
-      rect(i * w, j * w, w-1, w-1);
+      stroke(colourStroke);
+      rect(i * cellSize, j * cellSize, cellSize - gutterSize, cellSize - gutterSize);
     }
   }
 
@@ -82,6 +91,7 @@ function generate() {
         neighbors -= 1;
       }
       // Rules of Life
+      // instead of dying (0) right away, apply a decay for each cycle a cell isn't alive
       if      ((board[x][y] == 1) && (neighbors <  2)) next[x][y] = board[x][y] - decay;           // Loneliness
       else if ((board[x][y] == 1) && (neighbors >  3)) next[x][y] = board[x][y] - decay;           // Overpopulation
       else if ((board[x][y] < 1 ) && (neighbors == 3)) next[x][y] = 1;           // Reproduction
@@ -89,7 +99,7 @@ function generate() {
         if (board[x][y] == 1) {
           next[x][y] = 1;
         } else {
-          next[x][y] = board[x][y] -= decay
+          next[x][y] = board[x][y] - decay
         }
       }
     }
