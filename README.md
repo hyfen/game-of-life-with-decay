@@ -12,7 +12,7 @@ const colourAlive = '#f41';
 const colourDead = '#ccc';
 ```
 
-### Graysscale
+### Grayscale
 
 ![grayscale](/doc/white.gif)
 
